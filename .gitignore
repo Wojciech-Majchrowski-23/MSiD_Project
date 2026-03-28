@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# For your local files (eg. dataset.txt)
+local_folder/
