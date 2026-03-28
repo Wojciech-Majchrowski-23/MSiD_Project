@@ -12,3 +12,4 @@
 * **1 branch = 1 feature** (apply common sense, avoid over-fragmentation).
 * **No direct pushes to `main`** – all changes must go through branches, which makes reverting errors much easier.
 * **Branch naming convention:** `feature_name/action` (e.g., `algorithmA/fix`, `classB/update`).
+* **Create local folder after cloning repo and call it `local_folder`. Keep there your local files (e.g. dataset.txt)
