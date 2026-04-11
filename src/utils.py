@@ -1,9 +1,18 @@
 import numpy as np
 import pandas
+from pathlib import Path
 
-def get_data_from_csv(filename = r'local_folder\company_esg_financial_dataset.csv'):
+# By using Path("..") / "local_folder", pathlib automatically creates:
+# '..\local_folder' on Windows
+# '../local_folder' on macOS/Linux
+# Dodałam dostęp do plików przez Path bo inaczej mój mac wybuchał przez złe ściezki xd
 
-    dataFrame = pandas.read_csv(filename)
+LOCAL_FOLDER = Path(__file__).parent.parent / "local_folder"
+
+def get_data_from_csv(filepath : str = 'company_esg_financial_dataset.csv'):
+    filepath = LOCAL_FOLDER / filepath
+
+    dataFrame = pandas.read_csv(filepath)
     return dataFrame
 
 def get_data_year_range(dataFrame : pandas.DataFrame, min = 2020, max = 2024):
@@ -33,9 +42,13 @@ def cv(x : float):
     """
     return x.std() / x.mean() if x.mean() != 0 else np.nan
 
-def save_data_to_csv(dataFrame : pandas.DataFrame, directory = 'local_folder'):
+def save_data_to_csv(dataFrame : pandas.DataFrame):
+    output_dir = LOCAL_FOLDER
     output_file = 'aggregated_company_data.csv'
-    dataFrame.to_csv(fr"{directory}\{output_file}", index = False)
+
+    full_path = output_dir / output_file
+
+    dataFrame.to_csv(full_path, index = False)
 
 if __name__ == '__main__':
     df = get_data_from_csv()
