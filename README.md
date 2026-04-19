@@ -68,14 +68,21 @@ Zmienne wyrażane w skali punktowej (zazwyczaj 0-100), oceniające niefinansowe 
 
 ---
 
-## 4. Bezwzględne Wskaźniki Środowiskowe
-Surowe dane ilościowe dotyczące zużycia zasobów i emisji. 
+## 4. Wyliczone Metryki Rynkowe i Wyceny (Dodatkowe)
+Poniższe zmienne nie pochodzą bezpośrednio z surowych danych, lecz zostały wyliczone na etapie inżynierii cech (Feature Engineering), aby dostarczyć modelom głębszych informacji o rentowności i wycenie rynkowej spółek.
 
-> **Uwaga analityczna:** Wskaźniki te są silnie skorelowane z rozmiarem firmy (większa korporacja naturalnie zużywa więcej). W modelowaniu często ocenia się je w relacji do przychodów (np. `CarbonEmissions` / `Revenue`).
+* **`PriceToSales`** *(Wskaźnik P/S - Cena do Przychodu)*:
+  * **Wzór:** `MarketCap_mean / Revenue_mean`
+  * **Interpretacja:** Wskaźnik określa, ile inwestorzy płacą za każdego dolara przychodów generowanych przez firmę. Niskie wartości mogą sugerować, że spółka jest niedowartościowana (tania okazja), podczas gdy bardzo wysokie wartości często cechują popularne spółki technologiczne (oczekiwanie na potężny wzrost w przyszłości).
 
-* **`CarbonEmissions`** *(Emisje dwutlenku węgla)*: 
-  * Ilość wyemitowanych gazów cieplarnianych, zazwyczaj wyrażona w tonach (ekwiwalent CO2).
-* **`WaterUsage`** *(Zużycie wody)*: 
-  * Całkowite zużycie wody, zazwyczaj w metrach sześciennych. Krytyczny wskaźnik dla branż takich jak rolnictwo, produkcja napojów czy przemysł odzieżowy.
-* **`EnergyConsumption`** *(Zużycie energii)*: 
-  * Łączna energia (np. w gigadżulach) wykorzystana do prowadzenia operacji biznesowych i produkcyjnych.
+* **`NetIncome`** *(Szacowany Zysk Netto)*:
+  * **Wzór:** `Revenue_mean * (ProfitMargin_mean / 100)`
+  * **Interpretacja:** Przychody to tylko miara skali biznesu (ile pieniędzy przeszło przez firmę), a zysk netto to miara realnego sukcesu (ile pieniędzy fizycznie zostało w kasie po opłaceniu kosztów). Jest to absolutna podstawa do oceny zyskowności.
+
+* **`PriceToEarnings`** *(Wskaźnik P/E - Cena do Zysku)*:
+  * **Wzór:** `MarketCap_mean / NetIncome`
+  * **Interpretacja:** Najsłynniejszy wskaźnik na Wall Street. W uproszczeniu odpowiada na pytanie: "Ile lat zajęłoby firmie zarobienie na swoją własną wartość rynkową przy utrzymaniu obecnych zysków?". Optymalne wartości zależą od branży, ale zazwyczaj poziom 15-20 uważa się za zdrowy balans. (Uwaga: Ujemne wartości oznaczają, że firma przynosi straty).
+
+* **`Risk-AdjustedGrowth`** *(Wzrost skorygowany ryzykiem)*:
+  * **Wzór:** `GrowthRate_mean / GrowthRate_std`
+  * **Interpretacja:** Miernik jakości wzrostu firmy. Sama wysoka średnia wzrostu nie jest idealna, jeśli firma w jednym roku rośnie o 30%, a w kolejnym traci 20% (duże odchylenie standardowe). Wysoka wartość tego wskaźnika nagradza firmy, które rosną w sposób stabilny, systematyczny i przewidywalny (np. stałe 5% z roku na rok).
