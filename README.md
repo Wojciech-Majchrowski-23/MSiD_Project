@@ -48,6 +48,10 @@ Zmienne opisujące kondycję ekonomiczną i wielkość przedsiębiorstwa.
   * Procentowy wzrost przychodów rok do roku (YoY). 
   * **Interpretacja:** Miernik dynamiki rozwoju i potencjału ekspansji.
 
+  GrowthRate nie należy traktować jako tendencji całkowitej (można traktować tylko jako tendencję finansową), ponieważ nie uwzględia ESG.
+
+  Można dorobić tutaj współczynnik nachylenia regresji (a > 0 - tendencja wzrostowa)
+
 ---
 
 ## 3. Wskaźniki ESG (Zrównoważony Rozwój)
