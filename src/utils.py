@@ -41,6 +41,7 @@ def add_metrics(dataFrame : pandas.DataFrame):
     dataFrame['NetIncome'] = dataFrame['Revenue_mean'] * (dataFrame['ProfitMargin_mean'] / 100)
     dataFrame['PriceToEarnings'] = dataFrame['MarketCap_mean'] / dataFrame['NetIncome']
     dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_mean'] / dataFrame['GrowthRate_std']
+    dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth']
     dataFrame = dataFrame.round(2)
 
     return dataFrame

@@ -86,3 +86,7 @@ Poniższe zmienne nie pochodzą bezpośrednio z surowych danych, lecz zostały w
 * **`Risk-AdjustedGrowth`** *(Wzrost skorygowany ryzykiem)*:
   * **Wzór:** `GrowthRate_mean / GrowthRate_std`
   * **Interpretacja:** Miernik jakości wzrostu firmy. Sama wysoka średnia wzrostu nie jest idealna, jeśli firma w jednym roku rośnie o 30%, a w kolejnym traci 20% (duże odchylenie standardowe). Wysoka wartość tego wskaźnika nagradza firmy, które rosną w sposób stabilny, systematyczny i przewidywalny (np. stałe 5% z roku na rok).
+
+* **`Earnings-to-Growth`** *(Wskaźnik PEG - Cena/Zysk do Wzrostu skorygowanego ryzykiem)*:
+  * **Wzór:** `PriceToEarnings / Risk-AdjustedGrowth`
+  * **Interpretacja:** Uzupełnia klasyczny wskaźnik P/E o tempo rozwoju firmy, pozwalając ocenić, czy wysoka wycena spółki jest uzasadniona jej szybkim wzrostem. Spółka z wysokim P/E (np. 40) może być wciąż atrakcyjną inwestycją, jeśli jej zyski rosną o 50% rocznie (co da niski PEG). Zazwyczaj przyjmuje się, że wskaźnik PEG w okolicach 1.0 oznacza uczciwą wycenę, wartości poniżej 1.0 sugerują niedowartościowanie (okazję inwestycyjną), a wartości powyżej 1.5 - 2.0 mogą wskazywać, że akcje są "przegrzane" w stosunku do ich realnego potencjału wzrostu. (Uwaga: Wskaźnik traci sens interpretacyjny w przypadku ujemnego wzrostu lub strat firmy).
