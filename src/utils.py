@@ -2,10 +2,6 @@ import numpy as np
 import pandas
 from pathlib import Path
 
-# By using Path("..") / "local_folder", pathlib automatically creates:
-# '..\local_folder' on Windows
-# '../local_folder' on macOS/Linux
-# Dodałam dostęp do plików przez Path bo inaczej mój mac wybuchał przez złe ściezki xd
 
 LOCAL_FOLDER = Path(__file__).parent.parent / "local_folder"
 
