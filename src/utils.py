@@ -26,7 +26,8 @@ def aggregate_data_stats(dataFrame : pandas.DataFrame):
     
     string_cols = ['CompanyID', 'CompanyName', 'Industry', 'Region']
 
-    metrics = ['mean', 'std', cv, slope]
+    # WMA - Weighted Moving Average (średnia ważona zamiast zwykłej)
+    metrics = [WMA, 'std', cv, slope]
     
     dataFrame_grouped = dataFrame.groupby(string_cols)[numeric_cols].agg(metrics)
     dataFrame_grouped.columns = [f"{col[0]}_{col[1]}" for col in dataFrame_grouped.columns]
@@ -37,21 +38,44 @@ def aggregate_data_stats(dataFrame : pandas.DataFrame):
 
 def add_metrics(dataFrame : pandas.DataFrame):
 
-    dataFrame['PriceToSales'] = dataFrame['MarketCap_mean'] / dataFrame['Revenue_mean']
-    dataFrame['NetIncome'] = dataFrame['Revenue_mean'] * (dataFrame['ProfitMargin_mean'] / 100)
-    dataFrame['PriceToEarnings'] = dataFrame['MarketCap_mean'] / dataFrame['NetIncome']
-    dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_mean'] / dataFrame['GrowthRate_std']
+    dataFrame['PriceToSales'] = dataFrame['MarketCap_WMA'] / dataFrame['Revenue_WMA']
+    dataFrame['NetIncome'] = dataFrame['Revenue_WMA'] * (dataFrame['ProfitMargin_WMA'] / 100)
+    dataFrame['PriceToEarnings'] = dataFrame['MarketCap_WMA'] / dataFrame['NetIncome']
+    dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_WMA'] / dataFrame['GrowthRate_std']
     dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth']
+    dataFrame['ESG_Signal-to-Noise'] = dataFrame['ESG_Overall_slope'] / dataFrame['ESG_Overall_cv']
     dataFrame = dataFrame.round(2)
 
     return dataFrame
+
+def WMA(x: pandas.Series) -> float:
+    """
+    Oblicza średnią ważoną (Weighted Moving Average) dla serii danych.
+    Najnowsze obserwacje otrzymują najwyższą wagę, a najstarsze najniższą.
+    Zakłada, że dane wejściowe są posortowane chronologicznie!
+    """
+
+    x_clean = x.dropna()
+    n = len(x_clean)
+    
+    if n == 0:
+        return np.nan
+        
+    # 2. Generujemy wagi liniowe: np. [1, 2, 3, 4, 5] dla 5 lat
+    weights = np.arange(1, n + 1)
+    
+    # 3. Zwracamy średnią ważoną wbudowaną w NumPy
+    # JEŚLI CHCEMY JEDNAK ZWYKŁĄ ŚREDNIĄ, to wystarczy usunąć linijkę niżej "weights=weights"
+    return np.average(x_clean, weights=weights)
 
 def cv(x : pandas.Series) -> float:
     """
     Oblicza współczynnik zmienności (Coefficient of Variation) dla serii danych.
     W pandas nie ma wbudowanego cv, wiec tutaj jest prosta funkcja lambda
     """
-    return x.std() / x.mean() if x.mean() != 0 else np.nan
+    wma_val = WMA(x)
+
+    return x.std() / wma_val if wma_val != 0 else np.nan
 
 def slope(y : pandas.Series) -> float:
     """

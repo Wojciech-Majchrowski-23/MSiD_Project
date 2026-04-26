@@ -55,16 +55,10 @@ Zmienne opisujące kondycję ekonomiczną i wielkość przedsiębiorstwa.
 ---
 
 ## 3. Wskaźniki ESG (Zrównoważony Rozwój)
-Zmienne wyrażane w skali punktowej (zazwyczaj 0-100), oceniające niefinansowe aspekty działalności. **Wyższy wynik jest zawsze korzystniejszy.**
+Zmienne wyrażane w skali punktowej (zazwyczaj 0-100), oceniające niefinansowe aspekty działalności (environment, social, governance). **Wyższy wynik jest zawsze korzystniejszy.**
 
 * **`ESG_Overall`**: 
   * Zbiorcza, uśredniona ocena "odpowiedzialności" firmy.
-* **`ESG_Environmental`** *(Środowisko - E)*: 
-  * Ocena wpływu na naturę. Punktuje działania takie jak: wykorzystanie energii odnawialnej, redukcja śladu węglowego i gospodarka obiegu zamkniętego.
-* **`ESG_Social`** *(Społeczeństwo - S)*: 
-  * Ocena relacji społecznych. Punktuje: warunki pracy (BHP), równość i różnorodność, relacje ze związkami zawodowymi oraz wpływ na społeczności lokalne.
-* **`ESG_Governance`** *(Ład korporacyjny - G)*: 
-  * Ocena struktury i etyki zarządzania. Punktuje: przejrzystość finansową, brak korupcji, niezależność zarządu oraz poszanowanie praw mniejszościowych akcjonariuszy.
 
 ---
 
@@ -90,3 +84,10 @@ Poniższe zmienne nie pochodzą bezpośrednio z surowych danych, lecz zostały w
 * **`Earnings-to-Growth`** *(Wskaźnik PEG - Cena/Zysk do Wzrostu skorygowanego ryzykiem)*:
   * **Wzór:** `PriceToEarnings / Risk-AdjustedGrowth`
   * **Interpretacja:** Uzupełnia klasyczny wskaźnik P/E o tempo rozwoju firmy, pozwalając ocenić, czy wysoka wycena spółki jest uzasadniona jej szybkim wzrostem. Spółka z wysokim P/E (np. 40) może być wciąż atrakcyjną inwestycją, jeśli jej zyski rosną o 50% rocznie (co da niski PEG). Zazwyczaj przyjmuje się, że wskaźnik PEG w okolicach 1.0 oznacza uczciwą wycenę, wartości poniżej 1.0 sugerują niedowartościowanie (okazję inwestycyjną), a wartości powyżej 1.5 - 2.0 mogą wskazywać, że akcje są "przegrzane" w stosunku do ich realnego potencjału wzrostu. (Uwaga: Wskaźnik traci sens interpretacyjny w przypadku ujemnego wzrostu lub strat firmy).
+
+* **`ESG_Signal-to-Noise`** *(Wskaźnik Sygnału do Szumu dla ESG)*:
+  * **Wzór:** `ESG_Overall_slope / ESG_Overall_cv`
+  * **Interpretacja:** Zaawansowana metryka inspirowana wskaźnikiem Information Ratio, używana w analizie ilościowej (Quant). Łączy ona dwa wymiary zrównoważonego rozwoju: siłę trendu oraz jego stabilność.
+    * **Sygnał (Licznik - Slope):** Wskazuje kierunek i tempo zmian. Dodatni slope oznacza, że firma z roku na rok poprawia swoje standardy ESG.
+    * **Szum (Mianownik - CV):** Wskazuje na chaos i wahania. Wysokie CV oznacza, że oceny firmy są nieprzewidywalne.
+  * **Jak czytać ten wskaźnik?** Dzieląc sygnał przez szum, metryka ta bezlitośnie karze firmy, których polityka ESG jest chaotyczna. Bardzo wysoki, dodatni wynik oznacza spółkę, która konsekwentnie i stabilnie poprawia swoje standardy (idealna sytuacja). Wynik ujemny sygnalizuje stabilną degradację standardów, a wynik bliski zeru oznacza duży chaos informacyjny lub całkowitą stagnację.
