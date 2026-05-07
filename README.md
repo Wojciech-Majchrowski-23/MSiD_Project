@@ -23,9 +23,9 @@ Poniższy dokument opisuje znaczenie poszczególnych zmiennych (kolumn) w zagreg
 ## 1. Agregacje Statystyczne (Sufiksy)
 Z uwagi na to, że dane wejściowe dla algorytmów zostały przekształcone z formatu wieloletniego (panelowego) do postaci zagregowanej (jeden wiersz reprezentujący całą historię danej spółki), nazwy atrybutów zostały wzbogacone o odpowiednie sufiksy:
 
-* **`[Nazwa]_mean` (Średnia):** * Średnia wartość danego wskaźnika obliczona z całego analizowanego okresu historycznego (np. 5 lat). Reprezentuje ogólny, uśredniony poziom firmy.
+* **`[Nazwa]_WMA` (Średnia WAŻONA):** * Średnia ważona wartości danego wskaźnika obliczona z całego analizowanego okresu historycznego (np. 5 lat). Reprezentuje ogólny, uśredniony poziom firmy.
 * **`[Nazwa]_std` (Odchylenie standardowe):** * Klasyczna miara rozrzutu pokazująca, jak bardzo w poszczególnych latach wartości odchylały się od średniej.
-* **`[Nazwa]_cv` (Współczynnik Zmienności - *Coefficient of Variation*):** * Obliczony jako stosunek odchylenia standardowego do średniej (`std / mean`). 
+* **`[Nazwa]_cv` (Współczynnik Zmienności - *Coefficient of Variation*):** * Obliczony jako stosunek odchylenia standardowego do średniej (`std / WMA`). 
   * **Interpretacja biznesowa:** Jest to absolutnie kluczowa miara **ryzyka i stabilności**. 
     * **Niskie CV (bliskie 0):** Wskazuje, że dany parametr (np. przychody) jest niezwykle stabilny i przewidywalny z roku na rok.
     * **Wysokie CV:** Oznacza duże wahania, brak stabilności i wyższe ryzyko inwestycyjne.
