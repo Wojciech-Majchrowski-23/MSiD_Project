@@ -41,6 +41,7 @@ def add_metrics(dataFrame : pandas.DataFrame):
     dataFrame['PriceToSales'] = dataFrame['MarketCap_WMA'] / dataFrame['Revenue_WMA']
     dataFrame['NetIncome'] = dataFrame['Revenue_WMA'] * (dataFrame['ProfitMargin_WMA'] / 100)
     dataFrame['PriceToEarnings'] = dataFrame['MarketCap_WMA'] / dataFrame['NetIncome']
+    dataFrame['EarningsYield'] = dataFrame['NetIncome'] / dataFrame['MarketCap_WMA']
     dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_WMA'] / dataFrame['GrowthRate_std']
     dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth']
     dataFrame['ESG_Signal-to-Noise'] = dataFrame['ESG_Overall_slope'] / dataFrame['ESG_Overall_cv']
