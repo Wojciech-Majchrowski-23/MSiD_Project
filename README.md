@@ -77,6 +77,8 @@ Poniższe zmienne nie pochodzą bezpośrednio z surowych danych, lecz zostały w
   * **Wzór:** `MarketCap_mean / NetIncome`
   * **Interpretacja:** Najsłynniejszy wskaźnik na Wall Street. W uproszczeniu odpowiada na pytanie: "Ile lat zajęłoby firmie zarobienie na swoją własną wartość rynkową przy utrzymaniu obecnych zysków?". Optymalne wartości zależą od branży, ale zazwyczaj poziom 15-20 uważa się za zdrowy balans. (Uwaga: Ujemne wartości oznaczają, że firma przynosi straty).
 
+* **Uwgaga:** Został równiez dodany wskaźnik odwrotny do pozszego `EarningsYield: (NetIncome / MarketCap_mean)` w celu zachowania ciągłości interpretacji: wskaźnik ujemny - bardzo niskoa wartość, ujemy - niska wartość, średni - średnia wartość, wysoki - wysoka wartość
+
 * **`Risk-AdjustedGrowth`** *(Wzrost skorygowany ryzykiem)*:
   * **Wzór:** `GrowthRate_mean / GrowthRate_std`
   * **Interpretacja:** Miernik jakości wzrostu firmy. Sama wysoka średnia wzrostu nie jest idealna, jeśli firma w jednym roku rośnie o 30%, a w kolejnym traci 20% (duże odchylenie standardowe). Wysoka wartość tego wskaźnika nagradza firmy, które rosną w sposób stabilny, systematyczny i przewidywalny (np. stałe 5% z roku na rok).
