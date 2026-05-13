@@ -44,6 +44,12 @@ def add_metrics(dataFrame : pandas.DataFrame):
     dataFrame['EarningsYield'] = dataFrame['NetIncome'] / dataFrame['MarketCap_WMA']
     dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_WMA'] / dataFrame['GrowthRate_std']
     dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth']
+
+    # Dla firm, w ktorych jest ujemny przychod netto lub ujemny wzrost firmy dajemy olbrzymią karę
+    down_trend_companies = (dataFrame['NetIncome'] <= 0) | (dataFrame['Risk-AdjustedGrowth'] <= 0)
+    MAX_PENALTY_VALUE = dataFrame['Earnings-to-Growth'].quantile(0.95) 
+    dataFrame.loc[down_trend_companies, 'Earnings-to-Growth'] = MAX_PENALTY_VALUE
+
     dataFrame['ESG_Signal-to-Noise'] = dataFrame['ESG_Overall_slope'] / dataFrame['ESG_Overall_cv']
     dataFrame = dataFrame.round(2)
 
