@@ -16,7 +16,7 @@ def create_portfolios(scored_df, top_n=10):
 
 
     print("\n" + "="*30)
-    print("TOP 3 LIDRÓW PORTFELA:")
+    print("TOP 3 LIDERÓW PORTFELA:")
     top_3 = top_df.head(3)
     for i, (idx, row) in enumerate(top_3.iterrows(), 1):
         print(f"{i}. ID: {row['CompanyID']} | Score: {row['TARGET_SCORE']:.4f}")
