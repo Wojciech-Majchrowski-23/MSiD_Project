@@ -11,9 +11,11 @@ def get_data_from_csv(filepath : str = 'company_esg_financial_dataset.csv'):
     dataFrame = pandas.read_csv(filepath)
     return dataFrame
 
+
 def get_data_year_range(dataFrame : pandas.DataFrame, min = 2020, max = 2024):
      return dataFrame[(dataFrame['Year'] >= min) & (dataFrame['Year'] <= max)]
     
+
 def aggregate_data_stats(dataFrame : pandas.DataFrame):
     """
     W tej funkcji decydujecie po czym agregujecie.
@@ -36,24 +38,29 @@ def aggregate_data_stats(dataFrame : pandas.DataFrame):
 
     return dataFrame_grouped
 
+
 def add_metrics(dataFrame : pandas.DataFrame):
 
-    dataFrame['PriceToSales'] = dataFrame['MarketCap_WMA'] / dataFrame['Revenue_WMA']
+    dataFrame['PriceToSales'] = dataFrame['MarketCap_WMA'] / dataFrame['Revenue_WMA'].replace(0, np.nan)
     dataFrame['NetIncome'] = dataFrame['Revenue_WMA'] * (dataFrame['ProfitMargin_WMA'] / 100)
-    dataFrame['PriceToEarnings'] = dataFrame['MarketCap_WMA'] / dataFrame['NetIncome']
-    dataFrame['EarningsYield'] = dataFrame['NetIncome'] / dataFrame['MarketCap_WMA']
-    dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_WMA'] / dataFrame['GrowthRate_std']
-    dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth']
+    dataFrame['PriceToEarnings'] = dataFrame['MarketCap_WMA'] / dataFrame['NetIncome'].replace(0, np.nan)
+    dataFrame['EarningsYield'] = dataFrame['NetIncome'] / dataFrame['MarketCap_WMA'].replace(0, np.nan)
+    dataFrame['Risk-AdjustedGrowth'] = dataFrame['GrowthRate_WMA'] / dataFrame['GrowthRate_std'].replace(0,np.nan)
+    dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth'].replace(0, np.nan)
 
-    # Dla firm, w ktorych jest ujemny przychod netto lub ujemny wzrost firmy dajemy olbrzymią karę
-    down_trend_companies = (dataFrame['NetIncome'] <= 0) | (dataFrame['Risk-AdjustedGrowth'] <= 0)
-    MAX_PENALTY_VALUE = dataFrame['Earnings-to-Growth'].quantile(0.95) 
+    # Dla firm, w ktorych jest ujemny przychod netto lub ujemny wzrost firmy dajemy olbrzymią karę.
+    down_trend_companies = ((dataFrame['NetIncome'] <= 0) |(dataFrame['Risk-AdjustedGrowth'] <= 0))
+    MAX_PENALTY_VALUE = dataFrame['Earnings-to-Growth'].replace([np.inf, -np.inf], np.nan).quantile(0.95)
     dataFrame.loc[down_trend_companies, 'Earnings-to-Growth'] = MAX_PENALTY_VALUE
 
-    dataFrame['ESG_Signal-to-Noise'] = dataFrame['ESG_Overall_slope'] / dataFrame['ESG_Overall_cv']
+    ESG_STN = dataFrame['ESG_Overall_slope'] / dataFrame['ESG_Overall_cv'].replace(0, np.nan)
+    ESG_STN_finite = ESG_STN.replace([np.inf, -np.inf], np.nan)
+    cap = ESG_STN_finite.quantile(0.95)
+    dataFrame['ESG_Signal-to-Noise'] = ESG_STN_finite.fillna(cap)
     dataFrame = dataFrame.round(2)
 
     return dataFrame
+
 
 def WMA(x: pandas.Series) -> float:
     """
@@ -75,6 +82,7 @@ def WMA(x: pandas.Series) -> float:
     # JEŚLI CHCEMY JEDNAK ZWYKŁĄ ŚREDNIĄ, to wystarczy usunąć linijkę niżej "weights=weights"
     return np.average(x_clean, weights=weights)
 
+
 def cv(x : pandas.Series) -> float:
     """
     Oblicza współczynnik zmienności (Coefficient of Variation) dla serii danych.
@@ -83,6 +91,7 @@ def cv(x : pandas.Series) -> float:
     wma_val = WMA(x)
 
     return x.std() / wma_val if wma_val != 0 else np.nan
+
 
 def slope(y : pandas.Series) -> float:
     """
@@ -99,6 +108,7 @@ def slope(y : pandas.Series) -> float:
     slope = np.polyfit(x, y, 1)[0]
     return slope
 
+
 def save_data_to_csv(dataFrame : pandas.DataFrame):
     output_dir = LOCAL_FOLDER
     output_file = 'aggregated_company_data.csv'
@@ -107,9 +117,50 @@ def save_data_to_csv(dataFrame : pandas.DataFrame):
 
     dataFrame.to_csv(full_path, index = False)
 
+
+def standardization(dataFrame: pandas.DataFrame):
+    dataFrame = dataFrame.replace([np.inf, -np.inf], np.nan)
+
+    numeric_cols = dataFrame.select_dtypes(include=[np.number]).columns.tolist()
+    
+    if 'CompanyID' in numeric_cols:
+        numeric_cols.remove('CompanyID')
+    
+    std_vals = dataFrame[numeric_cols].std()
+    valid_cols = std_vals[std_vals > 0].index.tolist()
+    
+    skipped = [c for c in numeric_cols if c not in valid_cols]
+    if skipped:
+        print(f"Skipping standardization for constant columns: {skipped}")
+    
+    mean_vals = dataFrame[valid_cols].mean()
+    std_vals_valid = dataFrame[valid_cols].std()
+    dataFrame[valid_cols] = (dataFrame[valid_cols] - mean_vals) / std_vals_valid
+    dataFrame[valid_cols] = dataFrame[valid_cols].round(4)
+    
+    return dataFrame
+
+
+def clean_data_for_fuzzy(dataFrame: pandas.DataFrame):
+    df_clean = dataFrame.copy()
+    df_clean = df_clean.replace([np.inf, -np.inf], np.nan)
+
+    # Diagnostic: see who dies and why
+    key_cols = ['EarningsYield', 'Risk-AdjustedGrowth', 'ESG_Signal-to-Noise']
+    dropped = df_clean[df_clean[key_cols].isna().any(axis=1)][['CompanyName'] + key_cols]
+    if not dropped.empty:
+        print(f"Dropping {len(dropped)} rows due to NaN:\n{dropped}\n")
+
+    df_clean = df_clean.dropna(subset=key_cols)
+    df_clean = df_clean.reset_index(drop=True)
+    return df_clean
+
+
 if __name__ == '__main__':
     df = get_data_from_csv()
     df = get_data_year_range(df)
     df = aggregate_data_stats(df)
     df = add_metrics(df)
+    df = standardization(df)
+    df = clean_data_for_fuzzy(df)
     save_data_to_csv(df)
