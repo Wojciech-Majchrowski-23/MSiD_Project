@@ -1,43 +1,26 @@
 import pandas as pd
 from utils import get_data_from_csv
 from pathlib import Path
-import numpy as np
-import random
 import matplotlib.pyplot as plt
 
 LOCAL_FOLDER = Path(__file__).parent.parent / "local_folder"
 
-def create_portfolios(scored_df, top_n=10):
-    
+def create_concentration_portfolios(scored_df):
     sorted_df = scored_df.sort_values(by='TARGET_SCORE', ascending=False).copy()
     
-    top_df = sorted_df.iloc[0:11].copy()
-    bottom_df = sorted_df.tail(top_n).copy()
-
-
-    print("\n" + "="*30)
-    print("TOP 3 LIDERÓW PORTFELA:")
-    top_3 = top_df.head(3)
-    for i, (idx, row) in enumerate(top_3.iterrows(), 1):
-        print(f"{i}. ID: {row['CompanyID']} | Score: {row['TARGET_SCORE']:.4f}")
-    print("="*30 + "\n")
+    top_3 = sorted_df.head(3).copy()
+    top_10 = sorted_df.head(10).copy()
+    top_30 = sorted_df.head(30).copy()
+    all_market = sorted_df.copy()
     
-    all_ids = scored_df['CompanyID'].unique()
-    top_ids = top_df['CompanyID'].tolist()
-    remaining_ids = [idx for idx in all_ids if idx not in top_ids]
-    random_company_ids = random.sample(remaining_ids, top_n)
-    random_df = scored_df[scored_df['CompanyID'].isin(random_company_ids)].copy()
-    
-    return top_df, bottom_df, random_df
+    return top_3, top_10, top_30, all_market
 
-def calculate_score_weighted_returns_cash(portfolio_df, raw_df, initial_cash=100000, years=[2024, 2025]):
+def calculate_returns_cash(portfolio_df, raw_df, initial_cash=100000, years=[2024, 2025]):
     portfolio_df = portfolio_df.copy()
     portfolio_df['TARGET_SCORE'] = pd.to_numeric(portfolio_df['TARGET_SCORE'], errors='coerce')
     portfolio_df = portfolio_df.dropna(subset=['TARGET_SCORE'])
     
-    total_score = portfolio_df['TARGET_SCORE'].sum()
-    portfolio_df['Weight'] = portfolio_df['TARGET_SCORE'] / total_score
-    
+    portfolio_df['Weight'] = 1.0 / len(portfolio_df)
     portfolio_df['Initial_Investment'] = initial_cash * portfolio_df['Weight']
     
     roi_results = {2023: 0.0}
@@ -64,31 +47,36 @@ def calculate_score_weighted_returns_cash(portfolio_df, raw_df, initial_cash=100
         
     return roi_results, cash_results
 
-def plot_simulation(top_res, bottom_res, random_res):
-    years = sorted(top_res.keys())
+def plot_concentration_test(top3_res, top10_res, top30_res, all_res):
+    years = sorted(top3_res.keys())
     
-    plt.figure(figsize=(11, 7))
+    plt.figure(figsize=(12, 7))
     
-    plt.plot(years, [top_res[y]*100 for y in years], 
-             marker='o', label='Portfel TOP (Weighted by Score)', color='#2ca02c', linewidth=3)
+    plt.plot(years, [top3_res[y]*100 for y in years], 
+             marker='*', label='TOP 3 (Wysokie ryzyko/zysk)', color='#d62728', linewidth=4, markersize=14)
+             
+    plt.plot(years, [top10_res[y]*100 for y in years], 
+             marker='o', label='TOP 10 (Złoty środek)', color='#2ca02c', linewidth=3, markersize=10)
     
-    plt.plot(years, [random_res[y]*100 for y in years], 
-             marker='d', label='Portfel RANDOM', color='#ff7f0e', linestyle='--', linewidth=2)
-    
-    plt.plot(years, [bottom_res[y]*100 for y in years], 
-             marker='s', label='Portfel BOTTOM', color='#d62728', linewidth=2)
+    plt.plot(years, [top30_res[y]*100 for y in years], 
+             marker='s', label='TOP 30 (Bezpieczna dywersyfikacja)', color='#1f77b4', linewidth=2)
+             
+    plt.plot(years, [all_res[y]*100 for y in years], 
+             marker='.', label='Cały Badany Rynek (Benchmark)', color='gray', linestyle='--', linewidth=2)
 
     plt.axhline(0, color='black', linewidth=1, alpha=0.5)
-    plt.title('Symulacja Inwestycyjna (2024-2025)', fontsize=14)
+    plt.title('Porównanie portfeli', fontsize=15, pad=15)
     plt.ylabel('Skumulowany Zysk / Strata (%)', fontsize=12)
     plt.xlabel('Rok', fontsize=12)
     plt.xticks(years)
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper left', fontsize=10)
     plt.grid(True, alpha=0.3)
     
-    final_top = top_res[2025]*100
-    plt.annotate(f'{final_top:.1f}%', xy=(2025, final_top), xytext=(5, 5), 
-                 textcoords='offset points', weight='bold', color='#2ca02c')
+    offsets = [15, 0, -15]
+    for res, color, offset in zip([top3_res, top10_res, top30_res], ['#d62728', '#2ca02c', '#1f77b4'], offsets):
+        final_val = res[2025]*100
+        plt.annotate(f'{final_val:.1f}%', xy=(2025, final_val), xytext=(15, offset), 
+                     textcoords='offset points', weight='bold', color=color, fontsize=11)
 
     plt.show()
 
@@ -96,28 +84,23 @@ def run_final_simulation():
     raw_df = get_data_from_csv('company_esg_financial_dataset.csv')
     scored_df = pd.read_csv(LOCAL_FOLDER / 'scored_company_data.csv', sep=',')
     
-    top_df, bottom_df, random_df = create_portfolios(scored_df, top_n=10)
+    top3_df, top10_df, top30_df, all_df = create_concentration_portfolios(scored_df)
     
-    top_roi, top_cash = calculate_score_weighted_returns_cash(top_df, raw_df, initial_cash=100000)
+    top3_roi, top3_cash = calculate_returns_cash(top3_df, raw_df)
+    top10_roi, top10_cash = calculate_returns_cash(top10_df, raw_df)
+    top30_roi, top30_cash = calculate_returns_cash(top30_df, raw_df)
+    all_roi, all_cash = calculate_returns_cash(all_df, raw_df)
 
-    random_roi, random_cash = calculate_score_weighted_returns_cash(random_df, raw_df, initial_cash=100000)
-
-    print("-" * 30)
-    print(f"SYMULACJA INWESTYCYJNA (Kapitał początkowy: 100 000 PLN)")
-    print(f"Wartość portfela po 2024: {top_cash[2024]:,.2f} PLN")
-    print(f"Wartość portfela po 2025: {top_cash[2025]:,.2f} PLN")
-    print(f"Czysty zysk: {top_cash[2025] - 100000:,.2f} PLN")
-    print("-" * 30)
-
-
-    print("-" * 30)
-    print(f"SYMULACJA INWESTYCYJNA RANDOM (Kapitał początkowy: 100 000 PLN)")
-    print(f"Wartość portfela po 2024: {random_cash[2024]:,.2f} PLN")
-    print(f"Wartość portfela po 2025: {random_cash[2025]:,.2f} PLN")
-    print(f"Czysty zysk: {random_cash[2025] - 100000:,.2f} PLN")
-    print("-" * 30)
+    print("-" * 45)
+    print("WYNIKI TESTU (Kapitał: 100,000 PLN)")
+    print("-" * 45)
+    print(f"TOP 3    Zysk: {top3_cash[2025] - 100000:>10,.2f} PLN")
+    print(f"TOP 10  Zysk: {top10_cash[2025] - 100000:>10,.2f} PLN")
+    print(f"TOP 30 Zysk: {top30_cash[2025] - 100000:>10,.2f} PLN")
+    print(f"Cały Rynek     Zysk: {all_cash[2025] - 100000:>10,.2f} PLN")
+    print("-" * 45)
     
-
+    plot_concentration_test(top3_roi, top10_roi, top30_roi, all_roi)
 
 if __name__ == '__main__':
     run_final_simulation()
