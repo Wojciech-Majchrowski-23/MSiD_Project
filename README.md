@@ -78,7 +78,7 @@ Aby precyzyjnie odwzorować warunki rynkowe, na podstawie zagregowanych wartośc
   * **Interpretacja:** Obliczany jako stosunek kapitalizacji rynkowej do średnich ważonych przychodów firmy. Pozwala rynkowo ocenić czy dana firma jest relatywnie tania, czy znajduje się w bańce spekulacyjnej.
   * **Zasada w modelu:** Im **NIŻSZY** wynik metryki, tym lepsza firma.
 
-  * **`NetIncome`** *(Szacowany Zysk Netto)*:
+* **`NetIncome`** *(Szacowany Zysk Netto)*:
   * **Wzór:** `Revenue_mean * (ProfitMargin_mean / 100)`
   * **Interpretacja:** Przychody to tylko miara skali biznesu (ile pieniędzy przeszło przez firmę), a zysk netto to miara realnego sukcesu (ile pieniędzy fizycznie zostało w kasie po opłaceniu kosztów). Jest to absolutna podstawa do oceny zyskowności.
 
