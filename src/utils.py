@@ -49,7 +49,7 @@ def add_metrics(dataFrame : pandas.DataFrame):
     dataFrame['Earnings-to-Growth'] = dataFrame['PriceToEarnings'] / dataFrame['Risk-AdjustedGrowth'].replace(0, np.nan)
 
     # Dla firm, w ktorych jest ujemny przychod netto lub ujemny wzrost firmy dajemy olbrzymią karę.
-    down_trend_companies = ((dataFrame['NetIncome'] <= 0) |(dataFrame['Risk-AdjustedGrowth'] <= 0))
+    down_trend_companies = ((dataFrame['NetIncome'] <= 0) | (dataFrame['Risk-AdjustedGrowth'] <= 0))
     MAX_PENALTY_VALUE = dataFrame['Earnings-to-Growth'].replace([np.inf, -np.inf], np.nan).quantile(0.95)
     dataFrame.loc[down_trend_companies, 'Earnings-to-Growth'] = MAX_PENALTY_VALUE
 
