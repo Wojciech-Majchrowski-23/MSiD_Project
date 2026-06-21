@@ -1,7 +1,7 @@
 import numpy as np
 import pandas
 from pathlib import Path
-
+from db_manager import DatabaseManager
 
 LOCAL_FOLDER = Path(__file__).parent.parent / "local_folder"
 
@@ -155,7 +155,6 @@ def clean_data_for_fuzzy(dataFrame: pandas.DataFrame):
     df_clean = df_clean.reset_index(drop=True)
     return df_clean
 
-
 if __name__ == '__main__':
     df = get_data_from_csv()
     df = get_data_year_range(df)
@@ -163,4 +162,22 @@ if __name__ == '__main__':
     df = add_metrics(df)
     df = standardization(df)
     df = clean_data_for_fuzzy(df)
-    save_data_to_csv(df)
+    #save_data_to_csv(df)
+
+    db_manager = DatabaseManager('financial_data.db')
+    db_manager.save_companies(df)
+    
+    df_from_db = db_manager.get_companies()
+    print(df_from_db.head())
+
+    print("\n" + "="*40)
+    print("  GENEROWANIE RAPORTÓW Z BAZY DANYCH  ")
+    print("="*40)
+    
+    print("\n[Raport 1] Firmy z regionu Europa:")
+    europe_df = db_manager.get_companies_by_region('Europe')
+    print(europe_df)
+    
+    print("\n[Raport 2] TOP 3 firmy z najlepszym sygnałem ESG:")
+    top_esg = db_manager.get_top_esg_stars(limit=3)
+    print(top_esg)
