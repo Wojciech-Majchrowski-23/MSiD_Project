@@ -31,8 +31,8 @@ def calculate_returns_2025(portfolio_df, raw_df, initial_cash=100000):
         cash_in_company = row['Initial_Investment']
         
         try:
-            mcap_24 = raw_df[(raw_df['CompanyID'] == cid) & (raw_df['Year'] == 2024)]['MarketCap'].values[0]
-            mcap_25 = raw_df[(raw_df['CompanyID'] == cid) & (raw_df['Year'] == 2025)]['MarketCap'].values[0]
+            mcap_24 = raw_df[(raw_df['CompanyID'] == cid) & (raw_df['Year'] == 2023)]['MarketCap'].values[0]
+            mcap_25 = raw_df[(raw_df['CompanyID'] == cid) & (raw_df['Year'] == 2024)]['MarketCap'].values[0]
             
             current_value = cash_in_company * (mcap_25 / mcap_24)
             total_value_2025 += current_value

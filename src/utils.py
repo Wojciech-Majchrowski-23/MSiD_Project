@@ -12,7 +12,7 @@ def get_data_from_csv(filepath : str = 'company_esg_financial_dataset.csv'):
     return dataFrame
 
 
-def get_data_year_range(dataFrame : pandas.DataFrame, min = 2020, max = 2024):
+def get_data_year_range(dataFrame : pandas.DataFrame, min = 2020, max = 2023):
      return dataFrame[(dataFrame['Year'] >= min) & (dataFrame['Year'] <= max)]
     
 
@@ -111,7 +111,7 @@ def slope(y : pandas.Series) -> float:
 
 def save_data_to_csv(dataFrame : pandas.DataFrame):
     output_dir = LOCAL_FOLDER
-    output_file = 'aggregated_company_data.csv'
+    output_file = 'aggregated_and_standarised_company_data.csv'
 
     full_path = output_dir / output_file
 
