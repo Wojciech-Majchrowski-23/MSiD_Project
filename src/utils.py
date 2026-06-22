@@ -164,7 +164,7 @@ if __name__ == '__main__':
     df = clean_data_for_fuzzy(df)
     #save_data_to_csv(df)
 
-    db_manager = DatabaseManager('financial_data.db')
+    db_manager = DatabaseManager()
     db_manager.save_companies(df)
     
     df_from_db = db_manager.get_companies()
