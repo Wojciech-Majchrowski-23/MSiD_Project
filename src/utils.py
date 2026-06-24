@@ -1,7 +1,7 @@
 import numpy as np
 import pandas
 from pathlib import Path
-from db_manager import DatabaseManager
+from Baza_oraz_GUI.db_manager import DatabaseManager
 
 LOCAL_FOLDER = Path(__file__).parent.parent / "local_folder"
 
@@ -12,7 +12,7 @@ def get_data_from_csv(filepath : str = 'company_esg_financial_dataset.csv'):
     return dataFrame
 
 
-def get_data_year_range(dataFrame : pandas.DataFrame, min = 2020, max = 2023):
+def get_data_year_range(dataFrame : pandas.DataFrame, min, max):
      return dataFrame[(dataFrame['Year'] >= min) & (dataFrame['Year'] <= max)]
     
 
@@ -109,12 +109,9 @@ def slope(y : pandas.Series) -> float:
     return slope
 
 
-def save_data_to_csv(dataFrame : pandas.DataFrame):
-    output_dir = LOCAL_FOLDER
-    output_file = 'aggregated_and_standarised_company_data.csv'
+def save_data_to_csv(dataFrame : pandas.DataFrame, output_dir, output_file):
 
     full_path = output_dir / output_file
-
     dataFrame.to_csv(full_path, index = False)
 
 
@@ -157,27 +154,27 @@ def clean_data_for_fuzzy(dataFrame: pandas.DataFrame):
 
 if __name__ == '__main__':
     df = get_data_from_csv()
-    df = get_data_year_range(df)
+    df = get_data_year_range(df, 2022, 2024)
     df = aggregate_data_stats(df)
     df = add_metrics(df)
     df = standardization(df)
     df = clean_data_for_fuzzy(df)
-    #save_data_to_csv(df)
+    save_data_to_csv(df, LOCAL_FOLDER, 'aggregated_company_data.csv')
 
-    db_manager = DatabaseManager('financial_data.db')
-    db_manager.save_companies(df)
+    # db_manager = DatabaseManager('financial_data.db')
+    # db_manager.save_companies(df)
     
-    df_from_db = db_manager.get_companies()
-    print(df_from_db.head())
+    # df_from_db = db_manager.get_companies()
+    # print(df_from_db.head())
 
-    print("\n" + "="*40)
-    print("  GENEROWANIE RAPORTÓW Z BAZY DANYCH  ")
-    print("="*40)
+    # print("\n" + "="*40)
+    # print("  GENEROWANIE RAPORTÓW Z BAZY DANYCH  ")
+    # print("="*40)
     
-    print("\n[Raport 1] Firmy z regionu Europa:")
-    europe_df = db_manager.get_companies_by_region('Europe')
-    print(europe_df)
+    # print("\n[Raport 1] Firmy z regionu Europa:")
+    # europe_df = db_manager.get_companies_by_region('Europe')
+    # print(europe_df)
     
-    print("\n[Raport 2] TOP 3 firmy z najlepszym sygnałem ESG:")
-    top_esg = db_manager.get_top_esg_stars(limit=3)
-    print(top_esg)
+    # print("\n[Raport 2] TOP 3 firmy z najlepszym sygnałem ESG:")
+    # top_esg = db_manager.get_top_esg_stars(limit=3)
+    # print(top_esg)

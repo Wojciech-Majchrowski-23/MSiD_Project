@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from utils_gui import load_raw_data, get_unique_companies, calculate_custom_portfolio_returns
+from Baza_oraz_GUI.utils_gui import load_raw_data, get_unique_companies, calculate_custom_portfolio_returns
 import sys
 
 class InvestmentSimulatorGUI:
@@ -56,12 +56,10 @@ class InvestmentSimulatorGUI:
         self.right_frame = ttk.LabelFrame(main_container, text="Historyczna analiza metryk spółki (od 2016 r.)",  padding=(10, 10))
         self.right_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
-        # Inicjalizacja siatki wykresów (3 wiersze, 2 kolumny)
         self.fig, self.axes = plt.subplots(3, 2, figsize=(7, 7))
         self.plot_canvas = FigureCanvasTkAgg(self.fig, master=self.right_frame)
         self.plot_canvas.get_tk_widget().pack(fill="both", expand=True)
         
-        # Ekran powitalny wykresów
         for ax in self.axes.flat:
             ax.text(0.5, 0.5, "Wybierz spółkę z listy\naby zobaczyć historię", ha='center', va='center', color='gray')
             ax.grid(True, linestyle='--', alpha=0.5)
@@ -79,17 +77,14 @@ class InvestmentSimulatorGUI:
         # Zmiana roku również powinna odświeżyć wykres
         self.year_cb.bind("<<ComboboxSelected>>", self.on_year_changed)
 
-        # Budżet
         ttk.Label(config_frame, text="Budżet (PLN):", font = ("Arial", 18)).grid(row=1, column=0, sticky="w", pady=5)
         self.budget_var = tk.StringVar(value="100000")
         ttk.Entry(config_frame, textvariable=self.budget_var, width=18, font = ("Arial", 18)).grid(row=1, column=1, padx=10, pady=5)
 
-        # Liczba spółek
         ttk.Label(config_frame, text="Liczba spółek w portfelu:", font = ("Arial", 18)).grid(row=2, column=0, sticky="w", pady=5)
         self.num_companies_var = tk.StringVar(value="3")
         ttk.Entry(config_frame, textvariable=self.num_companies_var, width=18, font = ("Arial", 18)).grid(row=2, column=1, padx=10, pady=5)
 
-        # Przycisk generowania
         ttk.Button(config_frame, text="Generuj formularz spółek", command=self.generate_portfolio_fields).grid(row=3, column=0, columnspan=2, pady=10)
 
         # --- Ramka środkowa ze scrollowaniem (wewnątrz left_frame) ---
